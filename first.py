@@ -1,28 +1,23 @@
 from playwright.sync_api import sync_playwright
 
 with sync_playwright() as p:
-    # Launch browser with slow motion
     browser = p.chromium.launch(
         headless=False,
-        slow_mo=500   # 1 second delay between actions
+        slow_mo=1000
     )
     page = browser.new_page()
 
-    # Open website
-    page.goto("https://demoqa.com/menu")
+    page.goto("https://demoqa.com/text-box")
 
-    # Hover on "Main Item 2"
-    page.hover("text=Main Item 2")
+    page.fill("#userName", "Shubham")
+    page.fill("#userEmail", "shubham@test.com")
 
-    # Hover on sub menu
-    page.hover("text=SUB SUB LIST »")
+    # Take screenshot before submit
+    page.screenshot(path="before_submit.png")
 
-    # Hover on sub-sub item
-    page.hover("text=Sub Sub Item 1")
+    page.click("#submit")
 
-    # Pause to clearly see hover actions
-    page.wait_for_timeout(3000)
-
-    print("Mouse hover actions executed successfully!")
+    # Take screenshot after submit
+    page.screenshot(path="after_submit.png", full_page=True)
 
     browser.close()
