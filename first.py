@@ -4,28 +4,25 @@ with sync_playwright() as p:
     # Launch browser with slow motion
     browser = p.chromium.launch(
         headless=False,
-        slow_mo=1000   # 1 second delay between each action
+        slow_mo=500   # 1 second delay between actions
     )
-
     page = browser.new_page()
 
-    # 1️⃣ Open website
-    page.goto("https://demoqa.com/text-box")
+    # Open website
+    page.goto("https://demoqa.com/menu")
 
-    # 2️⃣ Fill form fields
-    page.fill("#userName", "Shubham")
-    page.fill("#userEmail", "shubham@test.com")
-    page.fill("#currentAddress", "Surat, India")
-    page.fill("#permanentAddress", "Gujarat, India")
+    # Hover on "Main Item 2"
+    page.hover("text=Main Item 2")
 
-    # 3️⃣ Click submit button
-    page.click("#submit")
+    # Hover on sub menu
+    page.hover("text=SUB SUB LIST »")
 
-    # 4️⃣ Verify output
-    page.wait_for_selector("#output")
-    print("Form submitted successfully!")
+    # Hover on sub-sub item
+    page.hover("text=Sub Sub Item 1")
 
-    # 5️⃣ Pause to see result
+    # Pause to clearly see hover actions
     page.wait_for_timeout(3000)
+
+    print("Mouse hover actions executed successfully!")
 
     browser.close()
