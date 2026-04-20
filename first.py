@@ -1,28 +1,19 @@
 from playwright.sync_api import sync_playwright
 
-def test_google_homepage():
-    with sync_playwright() as p:
-        browser = p.chromium.launch(
-            headless=False,
-            slow_mo=1000   # 👈 slows each action by 1 second
-        )
+with sync_playwright() as p:
+    browser = p.chromium.launch(
+        headless=False,
+        slow_mo=1000   # 👈 1000 ms = 1 second delay between actions
+    )
+    page = browser.new_page()
 
-        page = browser.new_page()
+    page.goto("https://the-internet.herokuapp.com/login")
 
-        # Step 1: Open a website
-        page.goto("https://www.google.com")
+    page.fill("#username", "tomsmith")
+    page.fill("#password", "SuperSecretPassword!")
+    page.click("button[type='submit']")
 
-        # Step 2: Validate page title
-        assert "Google" in page.title()
+    page.wait_for_selector(".flash.success")
+    print("Login successful!")
 
-        # Step 3: Check if search box is visible
-        search_box = page.locator("textarea[name='q']")
-        assert search_box.is_visible()
-
-        print("✅ Google homepage test passed")
-
-        browser.close()
-
-
-if __name__ == "__main__":
-    test_google_homepage()
+    browser.close()
