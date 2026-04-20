@@ -1,24 +1,19 @@
-from playwright.sync_api import sync_playwright
+def test_mouse_actions(page):
+    page.goto("https://demoqa.com/menu")
 
-with sync_playwright() as p:
-    browser = p.chromium.launch(
-        headless=False,
-        slow_mo=1000
-    )
+    # Hover Main Item 2
+    page.locator("text=Main Item 2").hover()
 
-    # Create context with video recording
-    context = browser.new_context(
-        record_video_dir="videos/",
-        record_video_size={"width": 1280, "height": 720}
-    )
+    # Wait until SUB SUB LIST is visible
+    page.locator("text=SUB SUB LIST »").wait_for(state="visible")
 
-    page = context.new_page()
+    # Hover SUB SUB LIST
+    page.locator("text=SUB SUB LIST »").hover()
 
-    page.goto("https://demoqa.com/buttons")
-
-    page.click("text=Click Me")
+    # Wait and hover Sub Sub Item 1
+    page.locator("text=Sub Sub Item 1").wait_for(state="visible")
+    page.locator("text=Sub Sub Item 1").hover()
 
     page.wait_for_timeout(3000)
 
-    context.close()   # ⚠️ IMPORTANT: video is saved only after context is closed
-    browser.close()
+    assert page.locator("text=Sub Sub Item 1").is_visible()
