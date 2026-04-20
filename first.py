@@ -1,19 +1,61 @@
-def test_mouse_actions(page):
-    page.goto("https://demoqa.com/menu")
+import pytest
+import random
 
-    # Hover Main Item 2
-    page.locator("text=Main Item 2").hover()
+# ---------------- PASS TEST ----------------
+def test_mouse_actions_pass(page):
+    page.goto("https://demoqa.com/buttons")
 
-    # Wait until SUB SUB LIST is visible
-    page.locator("text=SUB SUB LIST »").wait_for(state="visible")
+    # Right click
+    page.click("text=Right Click Me", button="right")
 
-    # Hover SUB SUB LIST
-    page.locator("text=SUB SUB LIST »").hover()
+    # Double click
+    page.dblclick("text=Double Click Me")
 
-    # Wait and hover Sub Sub Item 1
-    page.locator("text=Sub Sub Item 1").wait_for(state="visible")
-    page.locator("text=Sub Sub Item 1").hover()
+    assert page.locator("#rightClickMessage").is_visible()
+    assert page.locator("#doubleClickMessage").is_visible()
 
-    page.wait_for_timeout(3000)
 
-    assert page.locator("text=Sub Sub Item 1").is_visible()
+# ---------------- PASS TEST ----------------
+def test_drag_and_drop_pass(page):
+    page.goto("https://demoqa.com/droppable")
+
+    source = page.locator("#draggable")
+    target = page.locator("#droppable")
+
+    source.drag_to(target)
+
+    assert "Dropped!" in target.text_content()
+
+
+# ---------------- PASS TEST ----------------
+def test_scroll_and_keyboard_pass(page):
+    page.goto("https://demoqa.com/text-box")
+
+    page.keyboard.press("PageDown")
+    page.wait_for_timeout(1000)
+
+    page.fill("#userName", "Shubham")
+    page.keyboard.press("Tab")
+    page.keyboard.type("shubham@test.com")
+
+    assert page.locator("#userEmail").input_value() == "shubham@test.com"
+
+
+# ---------------- FLAKY TEST (RANDOM FAIL) ----------------
+@pytest.mark.flaky(reruns=2)
+def test_flaky_random_fail(page):
+    page.goto("https://example.com")
+
+    # Random failure (simulates unstable UI)
+    if random.choice([True, False]):
+        assert False, "Random flaky failure"
+
+    assert page.locator("h1").is_visible()
+
+
+# ---------------- INTENTIONAL FAIL ----------------
+def test_intentional_fail(page):
+    page.goto("https://demoqa.com")
+
+    # This element DOES NOT exist
+    assert page.locator("#nonExistingElement").is_visible()

@@ -2,27 +2,35 @@ import pytest
 import os
 from playwright.sync_api import sync_playwright
 
+# Retry failed tests automatically
+def pytest_addoption(parser):
+    parser.addoption("--reruns", action="store", default=1)
+
 @pytest.fixture(scope="function")
 def page(request):
     with sync_playwright() as p:
         browser = p.chromium.launch(
             headless=False,
-            slow_mo=1000
+            slow_mo=800
         )
 
         context = browser.new_context(
-            record_video_dir="videos/"
+            record_video_dir="videos/",
+            viewport={"width": 1280, "height": 720}
         )
 
         page = context.new_page()
         yield page
 
-        # Take screenshot if test fails
+        # Screenshot on failure
         if request.node.rep_call.failed:
             os.makedirs("screenshots", exist_ok=True)
-            page.screenshot(path=f"screenshots/{request.node.name}.png")
+            page.screenshot(
+                path=f"screenshots/{request.node.name}.png",
+                full_page=True
+            )
 
-        context.close()   # ⚠️ video saved here
+        context.close()   # video saved here
         browser.close()
 
 
