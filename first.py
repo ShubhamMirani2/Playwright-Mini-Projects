@@ -5,19 +5,20 @@ with sync_playwright() as p:
         headless=False,
         slow_mo=1000
     )
-    page = browser.new_page()
 
-    page.goto("https://demoqa.com/text-box")
+    # Create context with video recording
+    context = browser.new_context(
+        record_video_dir="videos/",
+        record_video_size={"width": 1280, "height": 720}
+    )
 
-    page.fill("#userName", "Shubham")
-    page.fill("#userEmail", "shubham@test.com")
+    page = context.new_page()
 
-    # Take screenshot before submit
-    page.screenshot(path="before_submit.png")
+    page.goto("https://demoqa.com/buttons")
 
-    page.click("#submit")
+    page.click("text=Click Me")
 
-    # Take screenshot after submit
-    page.screenshot(path="after_submit.png", full_page=True)
+    page.wait_for_timeout(3000)
 
+    context.close()   # ⚠️ IMPORTANT: video is saved only after context is closed
     browser.close()
