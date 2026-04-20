@@ -1,19 +1,31 @@
 from playwright.sync_api import sync_playwright
 
 with sync_playwright() as p:
+    # Launch browser with slow motion
     browser = p.chromium.launch(
         headless=False,
-        slow_mo=1000   # 👈 1000 ms = 1 second delay between actions
+        slow_mo=1000   # 1 second delay between each action
     )
+
     page = browser.new_page()
 
-    page.goto("https://the-internet.herokuapp.com/login")
+    # 1️⃣ Open website
+    page.goto("https://demoqa.com/text-box")
 
-    page.fill("#username", "tomsmith")
-    page.fill("#password", "SuperSecretPassword!")
-    page.click("button[type='submit']")
+    # 2️⃣ Fill form fields
+    page.fill("#userName", "Shubham")
+    page.fill("#userEmail", "shubham@test.com")
+    page.fill("#currentAddress", "Surat, India")
+    page.fill("#permanentAddress", "Gujarat, India")
 
-    page.wait_for_selector(".flash.success")
-    print("Login successful!")
+    # 3️⃣ Click submit button
+    page.click("#submit")
+
+    # 4️⃣ Verify output
+    page.wait_for_selector("#output")
+    print("Form submitted successfully!")
+
+    # 5️⃣ Pause to see result
+    page.wait_for_timeout(3000)
 
     browser.close()
