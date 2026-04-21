@@ -1,9 +1,22 @@
 import pytest
+from playwright.sync_api import sync_playwright
 
-@pytest.fixture(scope="function")
-def context(browser):
-    context = browser.new_context(
-        record_video_dir="videos/"
-    )
-    yield context
-    context.close()
+@pytest.fixture
+def page(request):
+    with sync_playwright() as p:
+        browser = p.chromium.launch(headless=False)
+        context = browser.new_context()
+
+        # start tracing
+        context.tracing.start(screenshots=True, snapshots=True)
+
+        page = context.new_page()
+        yield page
+
+        # save trace only if test failed
+        if request.node.rep_call.failed:
+            context.tracing.stop(path="trace.zip")
+        else:
+            context.tracing.stop()
+
+        browser.close()
