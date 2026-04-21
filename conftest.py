@@ -1,22 +1,13 @@
 import pytest
 from playwright.sync_api import sync_playwright
 
-@pytest.fixture
-def page(request):
+@pytest.fixture(scope="session")
+def api_context():
     with sync_playwright() as p:
-        browser = p.chromium.launch(headless=False)
-        context = browser.new_context()
-
-        # start tracing
-        context.tracing.start(screenshots=True, snapshots=True)
-
-        page = context.new_page()
-        yield page
-
-        # save trace only if test failed
-        if request.node.rep_call.failed:
-            context.tracing.stop(path="trace.zip")
-        else:
-            context.tracing.stop()
-
-        browser.close()
+        request_context = p.request.new_context(
+            extra_http_headers={
+                "x-api-key": "reqres-free-v1"
+            }
+        )
+        yield request_context
+        request_context.dispose()
