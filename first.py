@@ -20,7 +20,7 @@ def test_drag_and_drop_pass(page):
     page.goto("https://demoqa.com/droppable")
 
     source = page.locator("#draggable")
-    target = page.locator("#droppable")
+    target = page.get_by_text("Drop here")
 
     source.drag_to(target)
 
